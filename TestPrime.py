@@ -1,8 +1,6 @@
 from random import randrange, getrandbits
 from itertools import repeat
 
- #Reference: https://jhafranco.com/2012/01/29/rsa-implementation-in-python/
-
 def getPrime(n):
     """Get a n-bit pseudo-random prime"""
     def isProbablePrime(n, t = 1):
