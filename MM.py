@@ -15,6 +15,15 @@ def findMFactor(N):
 	return N;
 ###End of function
 
+def bits(N):
+	POW = 1;
+	N -= 1;
+	temp = N;
+	while temp > 0:
+		temp = N >> POW;
+		POW += 1;
+	return POW;
+###End of function
 
 def MReduction(x, N):
 	mFactor = findMFactor(N);
@@ -34,20 +43,42 @@ def MMultiplication(x, y, N):
 
 def MMultiplicationF(x, y, N, mFactor):
 	
-	xBar = MReductionF(x, N, mFactor);
-	yBar = MReductionF(y, N, mFactor);
+#	xBar = MReductionF(x, N, mFactor);
+#	yBar = MReductionF(y, N, mFactor);
 
 	mfBar = modInverse(mFactor, N);
-	numBar = xBar * yBar * mfBar;
-#	numBar = x * y * mFactor;
+#	numBar = xBar * yBar * mfBar;
+	numBar = x * y * mFactor;
 	resBar = numBar % N;
 
 	return (resBar*mfBar) % N;
 
 ###End of function
 
-
 def MExponentiation(x, e, N):
+	mFactor = findMFactor(N);
+	mfBar = mFactor % N;
+	xBar = MReductionF(x, N, mFactor);
+	temp = mfBar;
+
+	count = bits(e) - 1;
+
+	while count >= 0:
+		
+		temp = MMultiplicationF(temp, temp, N, mFactor);
+
+		if count == 0:
+			temp = MMultiplicationF(temp, xBar, N, mFactor);
+
+		count -= 1;
+	###End Of Loop
+
+	ans = modInverse(temp, N);
+	return ans;
+
+###End of function
+
+def Deprecated_MExponentiation(x, e, N):
 	
 	mFactor = findMFactor(N);
 
@@ -94,9 +125,12 @@ if __name__ == "__main__":
 		print MExponentiation(int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3]));
 	else:
 		#print MMultiplication(43, 56, 97);
-		from lib.Langui import generateLargePrime;
-		x = generateLargePrime(128);
-		e = generateLargePrime(128);
-		n = generateLargePrime(64);
-		print "x="+ str(x) +" | e="+ str(e) +" | n="+ str(n);
-		print MExponentiation(x, e, n);
+		print MExponentiation(43, 57, 97);
+		print Deprecated_MExponentiation(43, 57, 97);
+
+#		from lib.Langui import generateLargePrime;
+#		x = generateLargePrime(128);
+#		e = generateLargePrime(128);
+#		n = generateLargePrime(64);
+#		print "x="+ str(x) +" | e="+ str(e) +" | n="+ str(n);
+#		print MExponentiation(x, e, n);
