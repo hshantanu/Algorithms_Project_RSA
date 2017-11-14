@@ -67,87 +67,15 @@ def ReverseMMultiplication(a, b, N, rBar):
 
 
 
-# as much as i can understand, this algorithm was defined in the RNS paper we read,
-# NOT WORKING :(
-def PaperBased_MExponentiation_notWorking(x, e, N):
-    mFactor = findMFactor(N);
-    mfBar = mFactor % N;
-    xBar = MReductionF(x, N, mFactor);
-    temp = mfBar;
-
-    count = bits(e) - 1;
-
-    while count >= 0:
-
-        temp = MMultiplicationF(temp, temp, N, mFactor);
-
-        if count == 0:
-            temp = MMultiplicationF(temp, xBar, N, mFactor);
-
-        count -= 1;
-    ###End Of Loop
-
-    ans = modInverse(temp, N);
-    return ans;
-
-###End of function
-
-
-# Initially finds all power in the form "(x^2i) % N" using modulo exponentiation
-# then mutiplies the power results to create "(x^e) % N" using montgomery multiplication
-# WORKS FINE
-def ModuloExponentiation(x, e, N):
-
-    mFactor = findMFactor(N);
-
-    res = [];
-    count = 1;
-    tempExp = x % N;
-    res.append([count, tempExp]);
-
-    while count < e:
-        count *= 2;
-        tempExp *= tempExp;
-        tempExp = tempExp % N;
-        res.append([count, tempExp]);
-
-    if count == e:
-        return tempExp;
-    else:
-        ans = [];
-        count = e;
-        size = len(res) - 1;
-
-        for i in range(size, -1, -1):
-            temp = res[i];
-            if count>0 and count>=temp[0]:
-                count -= temp[0];
-                ans.append(temp[1]);
-
-        size = len(ans);
-
-        if size == 2:
-            return MMultiplicationF(ans[0], ans[1], N, mFactor);
-        else:
-            temp = MMultiplicationF(ans[0], ans[1], N, mFactor);
-            for i in xrange(2, size):
-                temp = MMultiplicationF(temp, ans[i], N, mFactor);
-            return temp;
-
-###End of function
-
-
 ### IMPLEMENTED AS PER MY UNDERSTANDING
 # first converts 'x' to montgomery domain, using 'mFactor', named as xBar
 # then finds all power in the form "(xBar^2i) % N" using montogomery and modulo exponentiation
 # then mutiplies the power results to create "(x^e) % N" using montgomery mutiplication
 # WORKS FINE :)
-def MExponentiation(x, e, N):
+def BasicMontogomeryExponentiation(x, e, N):
 
     mFactor = findMFactor(N);
     mfBar = modInverse(mFactor, N);
-
-    print str(mFactor) +"   "+ str(mfBar);
 
     res = [];
     count = 1;
@@ -187,14 +115,42 @@ def MExponentiation(x, e, N):
 
 
 
+# Initially finds all power in the form "(x^2i) % N" using modulo exponentiation and montgomery multiplication
+# then mutiplies the power results to create "(x^e) % N" using montgomery multiplication
+def MontogomeryExponentiation(x, e, N):
+
+    mFactor = findMFactor(N);
+    X = x;
+    E = e;
+    R = 1;
+
+    while E > 0:
+
+        if E%2 == 0:
+            X = MMultiplicationF(X, X, N , mFactor);
+            E /= 2;
+        else:
+            R = MMultiplicationF(X, R, N, mFactor);
+            E -= 1;
+
+    ###End Of Loop
+
+    return R;
+
+###End of function
+
+
+
 if __name__ == "__main__":
     import sys;
     if len(sys.argv) > 2:
-        print MExponentiation(int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3]));
+        print BasicMontogomeryExponentiation(int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3]));
     else:
-        #print MMultiplication(43, 56, 97);
-        print MExponentiation(43, 57, 97);
-        print ModuloExponentiation(43, 57, 97);
+        M = 192;
+        e = 57;
+        N = 97;
+        print BasicMontogomeryExponentiation(M, e, N);
+        print MontogomeryExponentiation(M, e, N);
 
         #		from lib.Langui import generateLargePrime;
         #		x = generateLargePrime(128);
