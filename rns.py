@@ -1,4 +1,5 @@
 import math
+import string
 import random
 from Crypto.Util import number
 
@@ -7,36 +8,37 @@ class ResidueNumberSystem(object):
 	Holds the RNS base and performs operations on numbers
 	"""
 
-	def __init__(self, method, numBits, numBasis):
+	# def __init__(self, method, numBits, numBasis):
+	def __init__(self):
 		""" Set the RNS base vector. All base elements must be coprime """
-		self.base = self.getBase(numBits, numBasis)
-		self.numBits = numBits
-		self.method = method
+		# self.base = self.getBase(numBits, numBasis)
+		# self.numBits = numBits
+		# self.method = method
 
-	def getBase(self, numBits, numBasis):
-		primeNums = []
-		for n in range(numBasis):
-			primeNum = number.getPrime(numBits)
-			while primeNum in primeNums:
-				primeNum = number.getPrime(numBits)
-			primeNums.append(primeNum)
-		return primeNums
+	def GenerateRNSBase(self, numbits, numbasis):
+		primenums = []
+		for n in range(numbasis):
+			primenum = number.getPrime(numbits)
+			while primenum in primenums:
+				primenum = number.getPrime(numbits)
+			primenums.append(primenum)
+		return primenums
 
-	def maxbits(self):
+	def maxbits(self, base, numbits, method="blocks"):
 		""" returns the max value that can be stored in the rns """
-		if (self.method == "mod"):
+		if (method == "mod"):
 			result = 1
-			for b in self.base:
+			for b in base:
 				result *= b
 			return math.floor(math.log(result, 2))
 		else:
-			return (self.numBits - 1) * len(self.base)
+			return (numbits - 1) * len(base)
 
-	def int2rns(self, number):
+	def ConvertIntToRNS(self, number, base, numbits, method="blocks"):
 		""" return rns representation of an int """
-		if self.method == "mod":
+		if method == "mod":
 			result = []
-			for b in self.base:
+			for b in base:
 				result.append(number % b)
 
 		else: # method == "blocks"
@@ -45,44 +47,53 @@ class ResidueNumberSystem(object):
 
 			# check length
 			strlen = len(binstr)
-			if strlen > self.maxbits():
+			if strlen > self.maxbits(base, numbits, method):
 				raise ValueError("Integer exceeds max rns integer")
 
 			# padd to length
-			padlen = self.maxbits() - strlen
+			padlen = self.maxbits(base, numbits, method) - strlen
 			pad = "0" * int(padlen)
 			binstr += pad
 
 
 			result = []
-			for i in range(len(self.base)):
-				valstr = binstr[(self.numBits - 1)*i : (self.numBits - 1)*(i+1)]
+			for i in range(len(base)):
+				valstr = binstr[(numbits - 1)*i : (numbits - 1)*(i+1)]
 				result.append(long(valstr, 2))
 		
 		return result
 
-	def msg2rns(self, msg):
-		if self.method == "blocks":
+	def ConvertMessageToRNS(self, msg, base, numbits, method="blocks"):
+		if method == "blocks":
 			hexmsg = msg.encode("hex")
 			decmsg = int(hexmsg, 16)
-			return self.int2rns(decmsg)
+			return self.ConvertIntToRNS(decmsg, base, numbits, method)
 
-	def randomMessage(self, n):
+	def GetRandomIntMessage(self, n):
 		return random.getrandbits(n)
 
-def main():
-	bits = 2**10
-	print "bits:", bits
-	rns = ResidueNumberSystem("blocks", bits, 1)
-	print "Max message bits:", rns.maxbits()
-	
-	M = rns.randomMessage(bits - 1)
+	def GetRandomMessage(self, n):
+		size = n / 8
+		chars=string.ascii_uppercase + string.digits
+		return ''.join(random.choice(chars) for _ in range(size))
 
-	# M = "Hello World! How are you? Good man! :)"
-	print "MsgInt: ", M
-	print "Base:  ", rns.base
-	# print "Msg: ", rns.msg2rns(M)
-	print "MsgRNS:", rns.int2rns(M)
+
+def main():
+	numbits = 2**8
+	method = "blocks"
+	numbasis = 2;
+	print "numbits:", numbits
+	print "method:", method
+	print "numbasis:", numbasis
+
+	rns = ResidueNumberSystem()
+	M = rns.GetRandomMessage(2*numbits - 1)
+	base = rns.GenerateRNSBase(numbits, numbasis)
+	M_rns = rns.ConvertMessageToRNS(M, base, numbits)
+
+	print "M:", M
+	print "base:", base
+	print "M_rns:", M_rns
 
 if __name__ == '__main__':
 	main()
