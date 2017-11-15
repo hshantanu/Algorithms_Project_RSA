@@ -98,7 +98,7 @@ def regularRSATrial(val_list):
     print "Regular Text: "
     print DT
     t2 = time()
-    print "Time: {:0.3f} s".format(round(t2 - t1, 3))
+    print "Time: {:0.10f} seconds".format((t2 - t1))
 
 for bits in [128, 512]:    
     val_list = generateRSAParameters(bits) #p,q,n,e,d
