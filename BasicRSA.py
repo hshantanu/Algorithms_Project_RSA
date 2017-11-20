@@ -5,6 +5,7 @@ from Crypto.Util import number
 import sys
 from time import time
 import RNS
+import random
 
 def getPrime(numBits):
     primeNum = number.getPrime(numBits)
@@ -29,17 +30,24 @@ def inv(p, q):
         t += q
     return t
 
+def gcd(a, b):
+    while b != 0:
+        a, b = b, a % b
+    return a
+
 def generateRSAParameters(bits):
     # Generate Public and Private Keys
-    # 65537 is the largest known prime number of the form {\displaystyle 2^{2^{n}}+1} 2^{{2^{{n}}}}+1 ( {\displaystyle n=4} n=4).
     p = getPrime(bits)
     q = getPrime(bits)
     var = (p - 1) * (q - 1)
     n = p * q
-    if n < 65537:
-        e, d = 3, inv(3, var)
-    else:
-        e, d = 65537, inv(65537, var)
+    e = random.randrange(1, var)
+    g = gcd(e, var)
+    while g != 1:
+        e = random.randrange(1, var)
+        g = gcd(e, var)
+    #Use Extended Euclid's Algorithm to generate the private key
+    d = inv(e, var)
     val_list = [p, q, n, e, d]
     return val_list
 
