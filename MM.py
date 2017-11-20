@@ -1,5 +1,4 @@
-from lib.MI import *
-import math
+from BasicRSA import inv as modInverse;
 
 #Assumed 64bit multiplication because of 64bit system architecture
 ARCH=64;
@@ -47,11 +46,11 @@ def MMultiplication(x, y, N):
 
 def MMultiplicationF(x, y, N, mFactor):
 
-    #	xBar = MReductionF(x, N, mFactor);
-    #	yBar = MReductionF(y, N, mFactor);
+    #xBar = MReductionF(x, N, mFactor);
+    #yBar = MReductionF(y, N, mFactor);
 
     mfBar = modInverse(mFactor, N);
-    #	numBar = xBar * yBar * mfBar;
+    #numBar = xBar * yBar * mfBar;
     numBar = x * y * mFactor;
     resBar = numBar % N;
 
@@ -66,76 +65,46 @@ def ReverseMMultiplication(a, b, N, rBar):
 ###End of function
 
 
+def ModularExponentiation(x, e, N):
 
-### IMPLEMENTED AS PER MY UNDERSTANDING
-# first converts 'x' to montgomery domain, using 'mFactor', named as xBar
-# then finds all power in the form "(xBar^2i) % N" using montogomery and modulo exponentiation
-# then mutiplies the power results to create "(x^e) % N" using montgomery mutiplication
-# WORKS FINE :)
-def BasicMontogomeryExponentiation(x, e, N):
-
-    mFactor = findMFactor(N);
-    mfBar = modInverse(mFactor, N);
-
-    res = [];
-    count = 1;
-    tempExp = MReductionF(x, N, mFactor);               #PS: xBar = tempExp
-    res.append([count, x]);
-
-    while count < e:
-        count *= 2;
-        tempExp *= tempExp;
-        tempExp = MReverse(tempExp, N, mfBar);
-        res.append([count, tempExp]);
-
-    if count == e:
-        return MReverse(tempExp, N, mfBar);
-    else:
-        ans = [];
-        count = e;
-        size = len(res) - 1;
-
-        for i in range(size, -1, -1):
-            temp = res[i];
-            if count>0 and count>=temp[0]:
-                count -= temp[0];
-                ans.append(temp[1]);
-
-        size = len(ans);
-
-        if size == 2:
-            return ReverseMMultiplication(ans[0], ans[1], N, mfBar);
-        else:
-            temp = ReverseMMultiplication(ans[0], ans[1], N, mfBar);
-            for i in xrange(2, size):
-                temp = ReverseMMultiplication(temp, ans[i], N, mfBar);
-            return temp;
-
-###End of function
-
-
-
-# Initially finds all power in the form "(x^2i) % N" using modulo exponentiation and montgomery multiplication
-# then mutiplies the power results to create "(x^e) % N" using montgomery multiplication
-def MontogomeryExponentiation(x, e, N):
-
-    mFactor = findMFactor(N);
-    X = x;
+    X = x % N;
     E = e;
     R = 1;
 
     while E > 0:
 
         if E%2 == 0:
-            X = MMultiplicationF(X, X, N , mFactor);
+            X = (X*X) % N;
             E /= 2;
         else:
-            R = MMultiplicationF(X, R, N, mFactor);
+            R = (X*R) % N
             E -= 1;
 
     ###End Of Loop
 
-    return R;
+    return R%N;
+
+###End of function
+
+
+def MontogomeryExponentiation(x, e, N):
+
+    mFactor = findMFactor(N);
+    X = x % N;
+    E = e;
+    R = 1;
+
+    while E > 0:
+
+        if E%2 == 0:
+            X = MMultiplicationF(X, X, N, mFactor);
+            E /= 2;
+        else:
+            R = MMultiplicationF(X, R, N, mFactor);
+            E -= 1;
+    ###End Of Loop
+
+    return R%N;
 
 ###End of function
 
@@ -144,13 +113,17 @@ def MontogomeryExponentiation(x, e, N):
 if __name__ == "__main__":
     import sys;
     if len(sys.argv) > 2:
-        print BasicMontogomeryExponentiation(int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3]));
+        print MontogomeryExponentiation(int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3]));
     else:
-        M = 192;
-        e = 57;
-        N = 97;
-        print BasicMontogomeryExponentiation(M, e, N);
-        print MontogomeryExponentiation(M, e, N);
+        M = 6936;
+        e = 65537;
+        N = 2707015397;
+        d = 1316468333
+
+        #print ModularExponentiation(M, e, N);
+        c = MontogomeryExponentiation(M, e, N);
+        print c;
+        print MontogomeryExponentiation(c, d, N);
 
         #		from lib.Langui import generateLargePrime;
         #		x = generateLargePrime(128);
