@@ -97,6 +97,7 @@ class ResidueNumberSystem(object):
 
 			binmsg = int(bits2, 2)
 			Md = binascii.unhexlify('%x' % binmsg)
+
 			if (Md[-1].encode("hex") == "00"):
 				Md = Md[0:-1]
 			return Md
@@ -112,7 +113,7 @@ class ResidueNumberSystem(object):
 
 def main():
 
-	numbits = 2**8
+	numbits = 2**6
 	method = "blocks"
 	numbasis = 2
 	print "numbits:", numbits
@@ -131,6 +132,7 @@ def main():
 
 	# print Md
 	print "Md:", Md
+	print "M == Md:", M == Md
 
 if __name__ == '__main__':
 	main()
