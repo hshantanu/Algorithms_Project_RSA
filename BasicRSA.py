@@ -101,25 +101,11 @@ def printCipher(CT):
     print ""
 
 def regularRSATrial(M, e, n):
-    # val_list = [p, q, n, e, d]
-    #print M
     t1 = time()
-    # p = val_list[0]
-    # q = val_list[1]
-    # n = val_list[2]
-    # e = val_list[3]
-    # d = val_list[4]
-    CT = encrypt(M, e, n)
-    #    print "Cipher Text: "
-    #    printCipher(CT)
-    # DT = decrypt(CT, d, p, q, n)
-    #print "Decrypted Text: "
-    #print DT
+    encrypt(M, e, n)
     t2 = time()
-    #diff = "Time: {:0.10f} seconds".format((t2 - t1))
     diff = t2 - t1
-    #diff = float("{0:.5f}".format((t2-t1)*1000))                #in milliseconds
-    return (True, diff)
+    return diff
 
 if __name__ == '__main__':
     rns = RNS.ResidueNumberSystem()
