@@ -1,15 +1,14 @@
-    # Reference: https://jhafranco.com/2012/01/29/rsa-implementation-in-python/
+# Reference: https://jhafranco.com/2012/01/29/rsa-implementation-in-python/
 
 from functools import reduce
 from Crypto.Util import number
 import sys
 from time import time
-
+import RNS
 
 def getPrime(numBits):
     primeNum = number.getPrime(numBits)
     return primeNum
-
 
 def inv(p, q):
     # Multiplicative inverse
@@ -30,7 +29,6 @@ def inv(p, q):
         t += q
     return t
 
-
 def generateRSAParameters(bits):
     # Generate Public and Private Keys
     # 65537 is the largest known prime number of the form {\displaystyle 2^{2^{n}}+1} 2^{{2^{{n}}}}+1 ( {\displaystyle n=4} n=4).
@@ -44,7 +42,6 @@ def generateRSAParameters(bits):
         e, d = 65537, inv(65537, var)
     val_list = [p, q, n, e, d]
     return val_list
-
 
 def encrypt(M, e, n):
     # Return length (in bytes) of modulus
@@ -60,7 +57,6 @@ def encrypt(M, e, n):
         output += [(power >> j) & 0xff for j in reversed(range(0, (size + 2) << 3, 8))]
         M = M[size:]
     return output
-
 
 def decrypt(CT, d, p, q, n):
     # Decryption using Chinese Remainder Theorem
@@ -80,15 +76,14 @@ def decrypt(CT, d, p, q, n):
         CT = CT[size + 2:]
     return output
 
-
 def printCipher(CT):
     for index, elem in enumerate(CT):
         sys.stdout.write(str(elem))
     print ""
 
-
 def regularRSATrial(M, val_list):
     # val_list = [p, q, n, e, d]
+    #print M
     t1 = time()
     p = val_list[0]
     q = val_list[1]
@@ -99,16 +94,21 @@ def regularRSATrial(M, val_list):
     #    print "Cipher Text: "
     #    printCipher(CT)
     DT = decrypt(CT, d, p, q, n)
-    #    print "Decrypted Text: "
-    #    print DT
+    #print "Decrypted Text: "
+    #print DT
     t2 = time()
-    #    print "Time: {:0.10f} seconds".format((t2 - t1))
-    diff = float("{0:.5f}".format((t2-t1)*1000))                #in milliseconds
-    return [M==DT, diff ];
-
-
+    #diff = "Time: {:0.10f} seconds".format((t2 - t1))
+    diff = t2 - t1
+    #diff = float("{0:.5f}".format((t2-t1)*1000))                #in milliseconds
+    return (M == DT, diff)
 
 if __name__ == '__main__':
-    for bits in [16, 32, 64, 128, 512]:
+    rns = RNS.ResidueNumberSystem()
+    for bits in [16, 32, 64, 128, 512, 1024, 2048, 4096]:
+        #t1 = time()
         val_list = generateRSAParameters(bits)  # p,q,n,e,d
-        print regularRSATrial("this is a test message.", val_list)
+        M = rns.GetRandomMessage(bits)
+        print bits
+        print regularRSATrial(M, val_list)
+        #t2 = time()
+        #print "%g" %(t2 -t1)
