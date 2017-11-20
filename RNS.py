@@ -1,19 +1,13 @@
 import math
 import string
 import random
+import binascii
 from Crypto.Util import number
 
 class ResidueNumberSystem(object):
 	"""
 	Holds the RNS base and performs operations on numbers
 	"""
-
-	# def __init__(self, method, numBits, numBasis):
-	def __init__(self):
-		""" Set the RNS base vector. All base elements must be coprime """
-		# self.base = self.getBase(numBits, numBasis)
-		# self.numBits = numBits
-		# self.method = method
 
 	def GenerateRNSBase(self, numbits, numbasis):
 		primenums = []
@@ -44,6 +38,11 @@ class ResidueNumberSystem(object):
 		else: # method == "blocks"
 			# get str
 			binstr = str(bin(number))[2:]
+			padlen = 8 - (len(binstr) % 8)
+			if (padlen == 8):
+				padlen = 0
+			for i in range(padlen):
+				binstr = "0" + binstr
 
 			# check length
 			strlen = len(binstr)
@@ -69,6 +68,39 @@ class ResidueNumberSystem(object):
 			decmsg = int(hexmsg, 16)
 			return self.ConvertIntToRNS(decmsg, base, numbits, method)
 
+	def ConvertRNSToMessage(self, rns, base, method="blocks"):
+		if method == "blocks":
+			# convert each element to binary of the appropriate length
+			bits_rns = ""
+			for i in range(len(rns)):
+				number = rns[i]
+
+				b = str(bin(base[i]))[2:]
+
+				binary = str(bin(number))[2:]
+				delta_zeros = 8 - (len(binary) % 8) - 1
+				if (delta_zeros == 8):
+					delta_zeros = 0
+
+				# concatenate the binary
+				for j in range(delta_zeros):
+					bits_rns += '0'
+				bits_rns += binary
+
+			# convert binary to message
+			bits2 = "0b" + bits_rns
+			padlen = 8 - (len(bits_rns) % 8)
+			if (padlen == 8):
+				padlen = 0
+			for i in range(padlen):
+				bits2 += "0"
+
+			binmsg = int(bits2, 2)
+			Md = binascii.unhexlify('%x' % binmsg)
+			if (Md[-1].encode("hex") == "00"):
+				Md = Md[0:-1]
+			return Md
+
 	def GetRandomIntMessage(self, n):
 		return random.getrandbits(n)
 
@@ -79,9 +111,10 @@ class ResidueNumberSystem(object):
 
 
 def main():
+
 	numbits = 2**8
 	method = "blocks"
-	numbasis = 2;
+	numbasis = 2
 	print "numbits:", numbits
 	print "method:", method
 	print "numbasis:", numbasis
@@ -90,10 +123,14 @@ def main():
 	M = rns.GetRandomMessage(2*numbits - 1)
 	base = rns.GenerateRNSBase(numbits, numbasis)
 	M_rns = rns.ConvertMessageToRNS(M, base, numbits)
-
-	print "M:", M
+	print "M: ", M
 	print "base:", base
 	print "M_rns:", M_rns
+
+	Md = rns.ConvertRNSToMessage(M_rns, base)
+
+	# print Md
+	print "Md:", Md
 
 if __name__ == '__main__':
 	main()
