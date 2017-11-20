@@ -4,11 +4,6 @@ import random
 import binascii
 from Crypto.Util import number
 
-# class ResidueNumberSystem(object):
-# 	"""
-# 	Holds the RNS base and performs operations on numbers
-# 	"""
-
 def GenerateRNSBase(numbits, numbasis):
 	primenums = []
 	for n in range(numbasis):
@@ -120,7 +115,6 @@ def main():
 	print "method:", method
 	print "numbasis:", numbasis
 
-	# rns = ResidueNumberSystem()
 	M = GetRandomMessage(2*numbits - 1)
 	base = GenerateRNSBase(numbits, numbasis)
 	M_rns = ConvertMessageToRNS(M, base, numbits)
@@ -130,7 +124,6 @@ def main():
 
 	Md = ConvertRNSToMessage(M_rns, base)
 
-	# print Md
 	print "Md:", Md
 	print "M == Md:", M == Md
 

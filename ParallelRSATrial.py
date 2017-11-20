@@ -3,11 +3,6 @@ import MM
 import time
 import math
 
-# class ParallelRSA(object):
-# 	"""
-# 	Performs trials of RSA
-# 	"""
-
 def ParallelRSATrial(e, n, M, numProcessors, numbits):
 	B = RNS.GenerateRNSBase(numbits, numProcessors)
 
