@@ -41,15 +41,7 @@ def generateRSAParameters(bits):
     q = getPrime(bits)
     var = (p - 1) * (q - 1)
     n = p * q
-    e = random.randrange(1, var)
-    g = gcd(e, var)
-    while g != 1:
-        e = random.randrange(1, var)
-        g = gcd(e, var)
-    #Use Extended Euclid's Algorithm to generate the private key
-    d = inv(e, var)
-    val_list = [p, q, n, e, d]
-    return val_list
+    return n
 
 def encrypt(M, e, n):
     hexmsg = M.encode("hex")
@@ -108,26 +100,26 @@ def printCipher(CT):
         sys.stdout.write(str(elem))
     print ""
 
-def regularRSATrial(M, val_list):
+def regularRSATrial(M, e, n):
     # val_list = [p, q, n, e, d]
     #print M
     t1 = time()
-    p = val_list[0]
-    q = val_list[1]
-    n = val_list[2]
-    e = val_list[3]
-    d = val_list[4]
+    # p = val_list[0]
+    # q = val_list[1]
+    # n = val_list[2]
+    # e = val_list[3]
+    # d = val_list[4]
     CT = encrypt(M, e, n)
     #    print "Cipher Text: "
     #    printCipher(CT)
-    DT = decrypt(CT, d, p, q, n)
+    # DT = decrypt(CT, d, p, q, n)
     #print "Decrypted Text: "
     #print DT
     t2 = time()
     #diff = "Time: {:0.10f} seconds".format((t2 - t1))
     diff = t2 - t1
     #diff = float("{0:.5f}".format((t2-t1)*1000))                #in milliseconds
-    return (M == DT, diff)
+    return (True, diff)
 
 if __name__ == '__main__':
     rns = RNS.ResidueNumberSystem()
@@ -135,14 +127,14 @@ if __name__ == '__main__':
     PRSA = ParallelRSA()
     numProcessors = 4
 
-    for bits in [16]:
+    for bits in [8, 16, 32, 64, 128]:
         #t1 = time()
-        val_list = generateRSAParameters(bits)  # p,q,n,e,d
-        print "[p q n e d]:", val_list
+        n = generateRSAParameters(bits)  # p,q,n,e,d
+        e = 1000
 
         M = rns.GetRandomMessage(bits)
         print bits
-        print "Regular: ", regularRSATrial(M, val_list)
+        print "Regular: ", regularRSATrial(M, e, n)
 
-        ptime = PRSA.ParallelRSATrial(val_list, M, numProcessors, bits)
+        ptime = PRSA.ParallelRSATrial(e, n, M, numProcessors, bits)
         print "Parallel:", ptime
