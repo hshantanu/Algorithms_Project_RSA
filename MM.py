@@ -44,12 +44,11 @@ def MMultiplication(x, y, N):
     return MMultiplicationF(x, y, N, mFactor);
 ###End of function
 
-def MMultiplicationF(x, y, N, mFactor):
+def MMultiplicationF(x, y, N, mFactor, mfBar):
 
     #xBar = MReductionF(x, N, mFactor);
     #yBar = MReductionF(y, N, mFactor);
 
-    mfBar = modInverse(mFactor, N);
     #numBar = xBar * yBar * mfBar;
     numBar = x * y * mFactor;
     resBar = numBar % N;
@@ -90,6 +89,7 @@ def ModularExponentiation(x, e, N):
 def MontogomeryExponentiation(x, e, N):
 
     mFactor = findMFactor(N);
+    mfBar = modInverse(mFactor, N);
     X = x % N;
     E = e;
     R = 1;
@@ -97,10 +97,10 @@ def MontogomeryExponentiation(x, e, N):
     while E > 0:
 
         if E%2 == 0:
-            X = MMultiplicationF(X, X, N, mFactor);
+            X = MMultiplicationF(X, X, N, mFactor, mfBar);
             E /= 2;
         else:
-            R = MMultiplicationF(X, R, N, mFactor);
+            R = MMultiplicationF(X, R, N, mFactor, mfBar);
             E -= 1;
     ###End Of Loop
 
