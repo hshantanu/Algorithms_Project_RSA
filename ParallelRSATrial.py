@@ -9,8 +9,10 @@ import math
 # 	"""
 
 def ParallelRSATrial(e, n, M, numProcessors, numbits):
-	time1 = time.time()
 	B = RNS.GenerateRNSBase(numbits, numProcessors)
+
+	# assume RNS base already available prior to encryption
+	time1 = time.time()
 	Mrns = RNS.ConvertMessageToRNS(M, B, numbits)
 	Mrns_d = []
 
