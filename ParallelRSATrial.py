@@ -8,7 +8,13 @@ class ParallelRSA(object):
 	Performs trials of RSA
 	"""
 
-	def ParallelRSATrial(self, p, q, n, e, d, M, numProcessors, numbits):
+	def ParallelRSATrial(self, val_list, M, numProcessors, numbits):
+		p = val_list[0]
+		q = val_list[1]
+		n = val_list[2]
+		e = val_list[3]
+		d = val_list[4]
+
 		time1 = time.time()
 		rns = RNS.ResidueNumberSystem()
 		B = rns.GenerateRNSBase(numbits, numProcessors)
@@ -24,26 +30,17 @@ class ParallelRSA(object):
 			m = Mrns[i]
 			b = B[i]
 			start = time.time()
-			print "m:", m
-			c = MM.MontogomeryExponentiation(m, e, b)
-			print "c:", c
-			Mrns_d.append(MM.MontogomeryExponentiation(c, d, b))
+			c = MM.MontogomeryExponentiation(m, e, n)
+			Mrns_d.append(MM.MontogomeryExponentiation(c, d, n))
 			stop = time.time()
 			time2 = max(time2, stop - start)
 
-		print "Base:  ", B
-		print "Mrns_d:", Mrns_d
-		print "Mrns:  ", Mrns
-		# TODO: This does not match up. Somethng about encryption/decryption isn't working here
-		# Shouldn't these calls to MontExp() encode then decode m?
-		# Since we're not using n, instead the RNS base, need to do something different...
-
 		time3 = time.time()
-		Md = rns.ConvertRNSToMessage(Mrns, B)
+		Md = rns.ConvertRNSToMessage(Mrns_d, B)
 		while (Md[-1].encode("hex") == "00"):
 			Md = Md[0:-1]
 		time3 = time.time() - time3
-		return [Md, time1+time2+time3]
+		return [M==Md, time1+time2+time3]
 
 	def bitlength(self, n):
 		binstr = str(bin(n))[2:]
@@ -81,7 +78,7 @@ def main():
 	print "M: ", M
 
 	PRSA = ParallelRSA()
-	[Md, time] = PRSA.ParallelRSATrial(p, q, n, e, d, M, numProcessors, numbits)
+	[Md, time] = PRSA.ParallelRSATrial(val_list, M, numProcessors, numbits)
 	
 	print "Md:", Md
 	print "time:", time
