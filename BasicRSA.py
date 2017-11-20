@@ -109,6 +109,6 @@ def regularRSATrial(M, val_list):
 
 
 if __name__ == '__main__':
-    for bits in [128, 512]:
+    for bits in [16, 32, 64, 128, 512]:
         val_list = generateRSAParameters(bits)  # p,q,n,e,d
-        regularRSATrial(val_list)
+        print regularRSATrial("this is a test message.", val_list)
