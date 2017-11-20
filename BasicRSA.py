@@ -108,9 +108,8 @@ def regularRSATrial(M, e, n):
     return diff
 
 if __name__ == '__main__':
-    rns = RNS.ResidueNumberSystem()
-    from ParallelRSATrial import ParallelRSA
-    PRSA = ParallelRSA()
+    import ParallelRSATrial
+    # PRSA = ParallelRSA()
     numProcessors = 4
 
     for bits in [8, 16, 32, 64, 128]:
@@ -118,9 +117,9 @@ if __name__ == '__main__':
         n = generateRSAParameters(bits)  # p,q,n,e,d
         e = 1000
 
-        M = rns.GetRandomMessage(bits)
+        M = RNS.GetRandomMessage(bits)
         print bits
         print "Regular: ", regularRSATrial(M, e, n)
 
-        ptime = PRSA.ParallelRSATrial(e, n, M, numProcessors, bits)
+        ptime = ParallelRSATrial.ParallelRSATrial(e, n, M, numProcessors, bits)
         print "Parallel:", ptime
