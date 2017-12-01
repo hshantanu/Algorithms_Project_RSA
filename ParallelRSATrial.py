@@ -29,7 +29,7 @@ def bitlength(n):
 	l = len(binstr)
 	return l
 
-def main():
+# def main():
 	# import BasicRSA
 	# import RNS
 	# numbits = 16
@@ -53,6 +53,6 @@ def main():
 	
 	# print "time:", time
 
-if __name__ == '__main__':
-	main()
+# if __name__ == '__main__':
+# 	main()
 
