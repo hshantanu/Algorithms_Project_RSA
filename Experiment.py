@@ -1,11 +1,12 @@
 from BasicRSA import *
 from ParallelRSATrial import ParallelRSATrial
 
-MIN_BIT_SIZE = 8;
-MAX_BIT_SIZE = 4096;
-TEST_CASES = 3;
+MIN_BIT_SIZE = 8
+MAX_BIT_SIZE = 4096
+TEST_CASES = 64
 
 PROCESSORS = 4
+SYS_ARCH_BIT = 64
 
 def average(list):
 
@@ -57,7 +58,6 @@ def accuracy(list):
 
 def varyN():
 
-    #MSG = "This message is a small text.";
     bits = MIN_BIT_SIZE;
     e = 1023
 
@@ -68,18 +68,13 @@ def varyN():
 
         rTimeList = [];
         pTimeList = [];
-        #rStatList = [];
-        #pStatList = [];
 
 
         for t in xrange(0, TEST_CASES):
 
             n = generateRSAParameters(bits);
 
-            #rStatList.append( regularRSATrial(MSG, e, n)[0] );
             rTimeList.append( regularRSATrial(MSG, e, n) );
-
-            #pStatList.append( ParallelRSATrial(e, n, MSG, PROCESSORS, bits)[0] );
             pTimeList.append( ParallelRSATrial(e, n, MSG, PROCESSORS, bits) );
 
         ### End of for loop
@@ -89,14 +84,12 @@ def varyN():
         print "Time Consumed: "+ str(rTimeList);
         print "Average Time: "+ str( average(rTimeList) );
         print "Standard Deviation: " + str(standardDeviation(rTimeList));
-        #print "Accuracy: " + str( accuracy(rStatList) ) +"%";
         print "\n";
 
         print "------------Improved RSA------------";
         print "Time Consumed: "+ str(pTimeList);
         print "Average Time: "+ str( average(pTimeList) );
         print "Standard Deviation: " + str(standardDeviation(pTimeList));
-        # print "Accuracy: " + str(accuracy(pStatList)) + "%";
         print "\n";
 
         bits *= 2;
@@ -113,24 +106,18 @@ def varyE():
 
     while e <= 65536:
 
-        print "===================================== " + str(e) + " ========================================\n";
+        print "===================================== ", e ," ========================================\n";
         MSG = RNS.GetRandomMessage(bits)
 
         rTimeList = [];
         pTimeList = [];
-        #rStatList = [];
-        #pStatList = [];
-
 
         for t in xrange(0, TEST_CASES):
 
             n = generateRSAParameters(bits);
 
             rTimeList.append( regularRSATrial(MSG, e, n) );
-            #rStatList.append( regularRSATrial(MSG, e, n)[0] );
-
             pTimeList.append( ParallelRSATrial(e, n, MSG, PROCESSORS, bits) );
-            #pStatList.append( ParallelRSATrial(e, n, MSG, PROCESSORS, bits)[0] );
 
         ### End of for loop
 
@@ -139,14 +126,12 @@ def varyE():
         print "Time Consumed: "+ str(rTimeList);
         print "Average Time: "+ str( average(rTimeList) );
         print "Standard Deviation: " + str(standardDeviation(rTimeList));
-        # print "Accuracy: " + str( accuracy(rStatList) ) +"%";
         print "\n";
 
         print "------------Improved RSA------------";
         print "Time Consumed: "+ str(pTimeList);
         print "Average Time: "+ str( average(pTimeList) );
         print "Standard Deviation: " + str(standardDeviation(pTimeList));
-        # print "Accuracy: " + str(accuracy(pStatList)) + "%";
         print "\n";
 
         e *= 2;
@@ -158,47 +143,26 @@ def varyE():
 
 def varyProcessors():
 
-    bits = 1024
+    bits = 4096
     e = 1023;
     p = 2;
+    n = generateRSAParameters(bits);
 
-    while p <= 512:
+    while p < (bits/SYS_ARCH_BIT):
 
         print "===================================== " + str(p) + " ========================================\n";
         MSG = RNS.GetRandomMessage(bits)
 
-        rTimeList = [];
         pTimeList = [];
-        #rStatList = [];
-        #pStatList = [];
-
 
         for t in xrange(0, TEST_CASES):
-
-            n = generateRSAParameters(bits);
-
-            rTimeList.append( regularRSATrial(MSG, e, n) );
-            #rStatList.append( regularRSATrial(MSG, e, n)[0] );
-
             pTimeList.append( ParallelRSATrial(e, n, MSG, p, bits) );
-            #pStatList.append( ParallelRSATrial(e, n, MSG, PROCESSORS, bits)[0] );
-
         ### End of for loop
 
-
-        print "------------Regular RSA------------";
-        print "Time Consumed: "+ str(rTimeList);
-        print "Average Time: "+ str( average(rTimeList) );
-        print "Standard Deviation: " + str(standardDeviation(rTimeList));
-        # print "Accuracy: " + str( accuracy(rStatList) ) +"%";
-        print "\n";
-
-        print "------------Improved RSA------------";
         print "Time Consumed: "+ str(pTimeList);
         print "Average Time: "+ str( average(pTimeList) );
         print "Standard Deviation: " + str(standardDeviation(pTimeList));
-        # print "Accuracy: " + str(accuracy(pStatList)) + "%";
-        print "\n";
+        print "\n"
 
         p *= 2;
 
@@ -208,11 +172,13 @@ def varyProcessors():
 
 
 def start():
-    #varyN();
-    #varyE();
+    print "\n Varying N \n"
+    varyN()
+    print "\n Varying e \n"
+    varyE()
+    print "\n Varying no. of processors \n"
     varyProcessors()
 
 
 if __name__ == '__main__':
-    start();
-    #stat();
+    start()
