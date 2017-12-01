@@ -5,6 +5,7 @@ import binascii
 from Crypto.Util import number
 
 def GenerateRNSBase(numbits, numbasis):
+	"""Generates numbasis RNS bases each with bitsize numbits"""
 	primenums = []
 	for n in range(numbasis):
 		primenum = number.getPrime(numbits)
@@ -106,26 +107,26 @@ def GetRandomMessage(n):
 	return ''.join(random.choice(chars) for _ in range(size))
 
 
-def main():
+# def main():
 
-	numbits = 2**6
-	method = "blocks"
-	numbasis = 2
-	print "numbits:", numbits
-	print "method:", method
-	print "numbasis:", numbasis
+# 	numbits = 2**6
+# 	method = "blocks"
+# 	numbasis = 2
+# 	print "numbits:", numbits
+# 	print "method:", method
+# 	print "numbasis:", numbasis
 
-	M = GetRandomMessage(2*numbits - 1)
-	base = GenerateRNSBase(numbits, numbasis)
-	M_rns = ConvertMessageToRNS(M, base, numbits)
-	print "M: ", M
-	print "base:", base
-	print "M_rns:", M_rns
+# 	M = GetRandomMessage(2*numbits - 1)
+# 	base = GenerateRNSBase(numbits, numbasis)
+# 	M_rns = ConvertMessageToRNS(M, base, numbits)
+# 	print "M: ", M
+# 	print "base:", base
+# 	print "M_rns:", M_rns
 
-	Md = ConvertRNSToMessage(M_rns, base)
+# 	Md = ConvertRNSToMessage(M_rns, base)
 
-	print "Md:", Md
-	print "M == Md:", M == Md
+# 	print "Md:", Md
+# 	print "M == Md:", M == Md
 
-if __name__ == '__main__':
-	main()
+# if __name__ == '__main__':
+# 	main()
