@@ -22,7 +22,6 @@ def ParallelRSATrial(e, n, M, numProcessors, numbits):
 		stop = time.time()
 		time2 = max(time2, stop - start)
 
-	print (time1 ," ", time2)
 	return time1+time2
 
 def bitlength(n):
@@ -31,29 +30,28 @@ def bitlength(n):
 	return l
 
 def main():
-	import BasicRSA
-	import RNS
-	numbits = 16
-	numProcessors = 2
-	n = BasicRSA.generateRSAParameters(numbits)
-	# print val_list
-	print "n:", n
-	e = 1000
+	# import BasicRSA
+	# import RNS
+	# numbits = 16
+	# numProcessors = 2
+	# n = BasicRSA.generateRSAParameters(numbits)
+	# print "n:", n
+	# e = 1000
 
-	method = "blocks"
-	numbasis = 2
-	print "numbits:", numbits
-	print "method:", method
-	print "numbasis:", numbasis
+	# method = "blocks"
+	# numbasis = 2
+	# print "numbits:", numbits
+	# print "method:", method
+	# print "numbasis:", numbasis
 
-	rns = RNS.ResidueNumberSystem()
-	M = rns.GetRandomMessage(2*numbits - 1)
-	print "M: ", M
+	# rns = RNS.ResidueNumberSystem()
+	# M = rns.GetRandomMessage(2*numbits - 1)
+	# print "M: ", M
 
-	# PRSA = ParallelRSA()
-	time = ParallelRSATrial(e, n, M, numProcessors, numbits)
+	# # PRSA = ParallelRSA()
+	# time = ParallelRSATrial(e, n, M, numProcessors, numbits)
 	
-	print "time:", time
+	# print "time:", time
 
 if __name__ == '__main__':
 	main()
