@@ -4,7 +4,7 @@ import time
 import math
 
 def ParallelRSATrial(e, n, M, numProcessors, numbits):
-	B = RNS.GenerateRNSBase(numbits, numProcessors)
+	B = RNS.GenerateRNSBase((numbits/numProcessors + 1), numProcessors)
 
 	# assume RNS base already available prior to encryption
 	time1 = time.time()
@@ -22,6 +22,7 @@ def ParallelRSATrial(e, n, M, numProcessors, numbits):
 		stop = time.time()
 		time2 = max(time2, stop - start)
 
+	print (time1 ," ", time2)
 	return time1+time2
 
 def bitlength(n):

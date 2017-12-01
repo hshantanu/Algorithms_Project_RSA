@@ -1,16 +1,17 @@
 # Reference: https://jhafranco.com/2012/01/29/rsa-implementation-in-python/
 
-from functools import reduce
-from Crypto.Util import number
 import sys
+from Crypto.Util import number
 from time import time
+
 import RNS
-import random
+
 
 def getPrime(numBits):
     primeNum = number.getPrime(numBits)
     return primeNum
 
+#O(log-q)
 def inv(p, q):
     # Multiplicative inverse
     def xgcd(x, y):

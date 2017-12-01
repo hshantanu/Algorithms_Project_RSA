@@ -1,4 +1,5 @@
 from BasicRSA import inv as modInverse;
+from time import time
 
 #Assumed 64bit multiplication because of 64bit system architecture
 ARCH=64;
@@ -86,6 +87,8 @@ def ModularExponentiation(x, e, N):
 ###End of function
 
 
+# O( log-e + log-N )
+# => O( log-N )
 def MontogomeryExponentiation(x, e, N):
 
     mFactor = findMFactor(N);
@@ -115,19 +118,22 @@ if __name__ == "__main__":
     if len(sys.argv) > 2:
         print MontogomeryExponentiation(int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3]));
     else:
-        M = 6936;
+        M = 86146846640684638466;
         e = 65537;
         N = 2707015397;
-        d = 1316468333
+        #d = 1316468333
+
+
+        for p in range(2,8192):
+            e = pow(2, p) + 1
+
+            start = time()
+            MontogomeryExponentiation(M, e, N)
+            stop = time()
+
+            print p, " ", (stop - start)
 
         #print ModularExponentiation(M, e, N);
-        c = MontogomeryExponentiation(M, e, N);
-        print c;
-        print MontogomeryExponentiation(c, d, N);
-
-        #		from lib.Langui import generateLargePrime;
-        #		x = generateLargePrime(128);
-        #		e = generateLargePrime(128);
-        #		n = generateLargePrime(64);
-        #		print "x="+ str(x) +" | e="+ str(e) +" | n="+ str(n);
-        #		print MExponentiation(x, e, n);
+        # c = MontogomeryExponentiation(M, e, N);
+        # print c;
+        # print MontogomeryExponentiation(c, d, N);
