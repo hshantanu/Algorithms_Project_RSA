@@ -8,8 +8,8 @@ def GenerateRNSBase(numbits, numbasis):
 	primenums = []
 	for n in range(numbasis):
 		primenum = number.getPrime(numbits)
-		while primenum in primenums:
-			primenum = number.getPrime(numbits)
+		# while primenum in primenums:
+		# 	primenum = number.getPrime(numbits)
 		primenums.append(primenum)
 	return primenums
 
