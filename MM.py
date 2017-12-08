@@ -15,14 +15,18 @@ def findMFactor(N):
     return N;
 ###End of function
 
-def bits(N):
-    POW = 1;
-    N -= 1;
-    temp = N;
-    while temp > 0:
-        temp = N >> POW;
-        POW += 1;
-    return POW;
+
+### R.R^-1 - N.N' = 1
+# Finds N'
+def modulusBar(N):
+    R = findMFactor(N)
+    RI = modInverse(R, N)
+    return modulusBarF(N, R, RI)
+###End of function
+
+def modulusBarF(N, R, RI):
+    temp = 1 + R*RI
+    return temp/N
 ###End of function
 
 def MReduction(x, N):
@@ -39,18 +43,43 @@ def MReverse(x, N, rBar):
     return (x*rBar) % N;
 ###End of function
 
+
 def MMultiplication(x, y, N):
-    #mFactor = 100;
-    mFactor = findMFactor(N);
-    return MMultiplicationF(x, y, N, mFactor);
+
+    mFactor = findMFactor(N)
+    mfBar = modInverse(mFactor, N)
+
+    xBar = MReductionF(x, N, mFactor)
+    yBar = MReductionF(y, N, mFactor)
+
+    a = MMultiplicationF(xBar, yBar, N, mFactor, mfBar)
+    a = MReverse(a, N, mfBar)
+    b = MMultiplicationOLD(x, y, N, mFactor, mfBar)
+    #return [a, b];
+    return a
+
+
 ###End of function
 
-def MMultiplicationF(x, y, N, mFactor, mfBar):
 
-    #xBar = MReductionF(x, N, mFactor);
-    #yBar = MReductionF(y, N, mFactor);
+def MMultiplicationF(xBar, yBar, N, mFactor, mfBar):
 
-    #numBar = xBar * yBar * mfBar;
+    NB = modulusBarF(N, mFactor, mfBar)
+
+    t = xBar * yBar
+    u = t + ( ((t*NB) % mFactor)*N )
+    u = u / mFactor
+
+    if u >= N:
+        return u-N
+    else:
+        return u
+
+###End of function
+
+
+def MMultiplicationOLD(x, y, N, mFactor, mfBar):
+
     numBar = x * y * mFactor;
     resBar = numBar % N;
 
@@ -59,43 +88,32 @@ def MMultiplicationF(x, y, N, mFactor, mfBar):
 ###End of function
 
 
-#to multiply two numbers in montogomery domain
-def ReverseMMultiplication(a, b, N, rBar):
-    return (a*b*rBar)%N;
-###End of function
+def getFactors(N):
 
+    mFactor = findMFactor(N);
+    mfBar = modInverse(mFactor, N);
 
-def ModularExponentiation(x, e, N):
-
-    X = x % N;
-    E = e;
-    R = 1;
-
-    while E > 0:
-
-        if E%2 == 0:
-            X = (X*X) % N;
-            E /= 2;
-        else:
-            R = (X*R) % N
-            E -= 1;
-
-    ###End Of Loop
-
-    return R%N;
+    return [mFactor, mfBar];
 
 ###End of function
 
 
-# O( log-e + log-N )
-# => O( log-N )
 def MontogomeryExponentiation(x, e, N):
 
     mFactor = findMFactor(N);
     mfBar = modInverse(mFactor, N);
-    X = x % N;
+
+    return MontogomeryExponentiationI(x, e, N, mFactor, mfBar)
+
+###End of function
+
+
+
+def MontogomeryExponentiationI(x, e, N, mFactor, mfBar):
+
+    X = MReductionF(x, N, mFactor);
+    R = mFactor % N;
     E = e;
-    R = 1;
 
     while E > 0:
 
@@ -107,10 +125,9 @@ def MontogomeryExponentiation(x, e, N):
             E -= 1;
     ###End Of Loop
 
-    return R%N;
+    return MReductionF(R, N, mfBar)
 
 ###End of function
-
 
 
 if __name__ == "__main__":
@@ -118,22 +135,15 @@ if __name__ == "__main__":
     if len(sys.argv) > 2:
         print MontogomeryExponentiation(int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3]));
     else:
-        M = 86146846640684638466;
-        e = 65537;
-        N = 2707015397;
-        #d = 1316468333
+        M = 436
+        # N = 2707015397
+        # d = 1316468333
+        e = 13
 
+        N = 437
+        d = 61
 
-        for p in range(2,8192):
-            e = pow(2, p) + 1
-
-            start = time()
-            MontogomeryExponentiation(M, e, N)
-            stop = time()
-
-            print p, " ", (stop - start)
-
-        #print ModularExponentiation(M, e, N);
-        # c = MontogomeryExponentiation(M, e, N);
-        # print c;
-        # print MontogomeryExponentiation(c, d, N);
+        c = MontogomeryExponentiation(M, e, N)
+        print c
+        print MontogomeryExponentiation(c, d, N)
+        #print MMultiplication(5, 6, N);
